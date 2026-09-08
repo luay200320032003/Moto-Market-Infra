@@ -18,5 +18,21 @@ module sql 'modules/sqlServer.bicep' = {
     sqlAdminPassword: sqlAdminPassword
   }
 }
+module storage 'modules/storageAccounts.bicep' = {
+  name: 'storageAccountsDeployment'
+  params: {
+    location: location
+  }
+}
+module staticWebApp 'modules/staticWebApp.bicep' = {
+  name: 'staticWebAppDeployment'
+}
+
+ module apiAppService 'modules/apiAppService.bicep' = {
+  name: 'apiAppServiceDeployment'
+  params: {
+    location: location
+  }
+}
 
 output sqlServerFqdn string = sql.outputs.sqlServerFqdn
