@@ -1,0 +1,95 @@
+# Deploys main.bicep to the moto-market-rg resource group.
+# Auth: ARM service connection using Workload Identity Federation (OIDC) — no stored secrets.
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - main.bicep
+      - main.parameters.json
+      - modules/**
+      - azure-pipelines.yml
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - main.bicep
+      - main.parameters.json
+      - modules/**
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: moto-market-secrets
+  - name: azureServiceConnection
+    value: Bicep-moto-market-azure-connection
+  - name: resourceGroup
+    value: Moto-Market-Resource-Group
+  - name: location
+    value: canadacentral
+  - name: templateFile
+    value: main.bicep
+  - name: parametersFile
+    value: main.parameters.json
+
+stages:
+  - stage: Validate
+    displayName: What-if (preview changes)
+    jobs:
+      - job: whatif
+        displayName: az deployment group what-if
+        steps:
+          - task: AzureCLI@2
+            displayName: Run what-if
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+                az deployment group what-if \
+                  --resource-group "$(resourceGroup)" \
+                  --template-file "$(templateFile)" \
+                  --parameters "$(parametersFile)" \
+                  --parameters sqlAdminPassword="$SQL_ADMIN_PASSWORD"
+            env:
+              SQL_ADMIN_PASSWORD: $(sqlAdminPassword)
+
+  - stage: Deploy
+    displayName: Deploy to Azure
+    dependsOn: Validate
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: deploy
+        displayName: az deployment group create
+        environment: moto-market-prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - task: AzureCLI@2
+                  displayName: Deploy main.bicep
+                  inputs:
+                    azureSubscription: $(azureServiceConnection)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+                      az group create \
+                        --name "$(resourceGroup)" \
+                        --location "$(location)"
+                      az deployment group create \
+                        --resource-group "$(resourceGroup)" \
+                        --name "moto-market-$(Build.BuildId)" \
+                        --template-file "$(templateFile)" \
+                        --parameters "$(parametersFile)" \
+                        --parameters sqlAdminPassword="$SQL_ADMIN_PASSWORD"
+                  env:
+                    SQL_ADMIN_PASSWORD: $(sqlAdminPassword)
