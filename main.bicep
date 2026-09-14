@@ -35,4 +35,11 @@ module staticWebApp 'modules/staticWebApp.bicep' = {
   }
 }
 
+module functionApp 'modules/functionApp.bicep' = {
+  name: 'functionAppDeployment'
+  params: {
+    location: location
+  }
+}
+
 output sqlServerFqdn string = sql.outputs.sqlServerFqdn
