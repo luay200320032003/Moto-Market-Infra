@@ -32,7 +32,7 @@ variables:
   - name: resourceGroup
     value: Moto-Market-Resource-Group
   - name: location
-    value: canadacentral
+    value: eastus
   - name: templateFile
     value: main.bicep
   - name: parametersFile
