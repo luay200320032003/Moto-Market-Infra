@@ -1,4 +1,4 @@
-# Deploys main.bicep to the moto-market-rg resource group.
+# Deploys main.bicep to the Moto-Market-Resource-Group resource group.
 # Auth: ARM service connection using Workload Identity Federation (OIDC) — no stored secrets.
 
 trigger:
@@ -57,9 +57,11 @@ stages:
                   --resource-group "$(resourceGroup)" \
                   --template-file "$(templateFile)" \
                   --parameters "$(parametersFile)" \
-                  --parameters sqlAdminPassword="$SQL_ADMIN_PASSWORD"
+                  --parameters sqlAdminPassword="$SQL_ADMIN_PASSWORD" \
+                  --parameters backupsStorageKey="$BACKUPS_STORAGE_KEY"
             env:
               SQL_ADMIN_PASSWORD: $(sqlAdminPassword)
+              BACKUPS_STORAGE_KEY: $(backupsStorageKey)
 
   - stage: Deploy
     displayName: Deploy to Azure
@@ -90,6 +92,8 @@ stages:
                         --name "moto-market-$(Build.BuildId)" \
                         --template-file "$(templateFile)" \
                         --parameters "$(parametersFile)" \
-                        --parameters sqlAdminPassword="$SQL_ADMIN_PASSWORD"
+                        --parameters sqlAdminPassword="$SQL_ADMIN_PASSWORD" \
+                        --parameters backupsStorageKey="$BACKUPS_STORAGE_KEY"
                   env:
                     SQL_ADMIN_PASSWORD: $(sqlAdminPassword)
+                    BACKUPS_STORAGE_KEY: $(backupsStorageKey)

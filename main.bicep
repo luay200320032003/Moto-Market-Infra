@@ -10,6 +10,10 @@ param sqlAdminLogin string
 @secure()
 param sqlAdminPassword string
 
+@description('Storage account key for the backups storage account, used by the Logic App export action.')
+@secure()
+param backupsStorageKey string
+
 module sql 'modules/sqlServer.bicep' = {
   name: 'sqlServerDeployment'
   params: {
@@ -39,6 +43,14 @@ module functionApp 'modules/functionApp.bicep' = {
   name: 'functionAppDeployment'
   params: {
     location: location
+  }
+}
+module logicApp 'modules/logicApp.bicep' = {
+  name: 'logicAppDeployment'
+  params: {
+    location: location
+    sqlAdminPassword: sqlAdminPassword
+    backupsStorageKey: backupsStorageKey
   }
 }
 
