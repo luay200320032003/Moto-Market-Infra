@@ -54,4 +54,13 @@ module logicApp 'modules/logicApp.bicep' = {
   }
 }
 
+module dnsZone 'modules/dnsZone.bicep' = {
+  name: 'dnsZoneDeployment'
+  params: {
+    staticWebAppId: staticWebApp.outputs.staticWebAppId
+    staticWebAppDefaultHostname: staticWebApp.outputs.staticWebAppDefaultHostname
+  }
+}
+
 output sqlServerFqdn string = sql.outputs.sqlServerFqdn
+output dnsNameServers array = dnsZone.outputs.nameServers
