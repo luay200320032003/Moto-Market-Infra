@@ -10,6 +10,9 @@
     },
     "sqlAdminPassword": {
       "value": ""
+    },
+     "adminPrincipalId": {
+      "value": "c9ddee10-4f01-482d-a8d2-9d18e8b286b9"
     }
   }
 }

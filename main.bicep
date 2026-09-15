@@ -62,5 +62,16 @@ module dnsZone 'modules/dnsZone.bicep' = {
   }
 }
 
+@description('Object ID of the admin user for Key Vault RBAC access.')
+param adminPrincipalId string
+
+module keyVault 'modules/keyVault.bicep' = {
+  name: 'keyVaultDeployment'
+  params: {
+    location: location
+    adminPrincipalId: adminPrincipalId
+  }
+}
+
 output sqlServerFqdn string = sql.outputs.sqlServerFqdn
 output dnsNameServers array = dnsZone.outputs.nameServers
