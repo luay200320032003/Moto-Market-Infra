@@ -73,5 +73,18 @@ module keyVault 'modules/keyVault.bicep' = {
   }
 }
 
+module appInsights 'modules/appInsights.bicep' = {
+  name: 'appInsightsDeployment'
+  params: {
+    location: location
+  }
+}
+
+module domainRegistration 'modules/domainRegistration.bicep' = {
+  name: 'domainRegistrationDeployment'
+}
+
 output sqlServerFqdn string = sql.outputs.sqlServerFqdn
 output dnsNameServers array = dnsZone.outputs.nameServers
+output appInsightsConnectionString string = appInsights.outputs.connectionString
+output domainExpirationTime string = domainRegistration.outputs.expirationTime

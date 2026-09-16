@@ -77,6 +77,16 @@ resource blobStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 resource blobServiceDefault 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' = {
   parent: blobStorage
   name: 'default'
+  properties: {
+    deleteRetentionPolicy: {
+      enabled: true
+      days: 7
+    }
+    containerDeleteRetentionPolicy: {
+      enabled: true
+      days: 7
+    }
+  }
 }
 
 resource listingImagesContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
